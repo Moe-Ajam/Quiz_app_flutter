@@ -7,6 +7,8 @@ import 'package:quiz_app/start_screen.dart';
 class Quiz extends StatefulWidget {
   const Quiz({super.key});
 
+
+
   @override
   State<Quiz> createState() {
     return _QuizState();
@@ -16,37 +18,48 @@ class Quiz extends StatefulWidget {
 class _QuizState extends State<Quiz> {
   var activeScreen = 'start-screen';
 
+  List<String> selectedAnswers = [];
+
   void switchScreen() {
     setState(() {
       activeScreen = 'questions-screen';
     });
   }
 
+  void restartQuiz (){
+    setState(() {
+      selectedAnswers = [];
+      activeScreen = 'questions-screen';
+    });
+  }
+
+  void chooseAnswer(answer) {
+    selectedAnswers.add(answer);
+
+    if (selectedAnswers.length == questions.length) {
+      setState(() {
+        activeScreen = 'results-screen';
+      });
+    }
+  }
+
   @override
   Widget build(context) {
     Widget screenWidget = StartScreen(switchScreen);
-    List<String> selectedAnswers = [];
 
-    void chooseAnswer(answer) {
-      selectedAnswers.add(answer);
-
-      if (selectedAnswers.length == questions.length) {
-        setState(() {
-          selectedAnswers = [];
-          activeScreen = 'results-screen';
-        });
-      }
-    }
 
     if (activeScreen == 'questions-screen') {
       screenWidget = QuestionsScreen(
         onSelectAnswer: chooseAnswer,
       );
     } else if (activeScreen == 'results-screen') {
-      screenWidget = const ResultsScreen(
-        chosenAnswers: [],
+      screenWidget = ResultsScreen(
+        chosenAnswers: selectedAnswers, onRestart: restartQuiz,
+
       );
     }
+
+
 
     return MaterialApp(
       home: Scaffold(
